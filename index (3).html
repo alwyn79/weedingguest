@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wedding Guest Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6f0;
+    --blush: #e8c4b0;
+    --rose: #c0745a;
+    --deep: #3a2218;
+    --gold: #b8975a;
+    --sage: #7a9478;
+    --light-sage: #e8efe7;
+    --muted: #8a7060;
+    --white: #fff;
+    --shadow: 0 4px 32px rgba(58,34,24,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--deep); min-height: 100vh; }
+
+  /* ── CONFIG BANNER ── */
+  #config-banner {
+    background: #fff8e8;
+    border-bottom: 2px solid var(--gold);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  #config-banner span { font-size: .82rem; color: #7a5a20; font-weight: 500; flex-shrink: 0; }
+  #config-banner input {
+    flex: 1; min-width: 260px;
+    border: 1.5px solid #e0cc90;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: 'Jost', sans-serif;
+    font-size: .85rem;
+    background: var(--white);
+    color: var(--deep);
+    outline: none;
+  }
+  #config-banner input:focus { border-color: var(--gold); }
+  .btn-save-url {
+    background: var(--gold);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-family: 'Jost', sans-serif;
+    font-size: .82rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .2s;
+  }
+  .btn-save-url:hover { background: #9a7a3a; }
+  #url-status { font-size: .78rem; color: var(--sage); font-weight: 500; }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--deep);
+    padding: 26px 40px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,.28);
+  }
+  .logo { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; color: var(--blush); font-size: 1.65rem; letter-spacing: .04em; }
+  .logo span { color: var(--gold); font-weight: 600; font-style: normal; }
+  nav { display: flex; gap: 6px; }
+  .nav-btn {
+    background: none; border: 1.5px solid transparent;
+    color: #cbb8a8; font-family: 'Jost', sans-serif;
+    font-size: .8rem; font-weight: 500; letter-spacing: .12em;
+    text-transform: uppercase; padding: 8px 18px; border-radius: 40px;
+    cursor: pointer; transition: all .2s;
+  }
+  .nav-btn:hover { color: var(--blush); border-color: rgba(200,150,120,.3); }
+  .nav-btn.active { background: var(--rose); color: #fff; border-color: var(--rose); }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 44px 40px; max-width: 920px; margin: 0 auto; animation: fadeUp .38s ease; }
+  .page.active { display: block; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+  .page-hero { margin-bottom: 36px; border-bottom: 1px solid rgba(184,151,90,.25); padding-bottom: 24px; }
+  .page-hero h1 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 2.5rem; color: var(--deep); }
+  .page-hero h1 em { color: var(--rose); font-style: italic; }
+  .page-hero p { margin-top: 6px; color: var(--muted); font-size: .88rem; font-weight: 300; }
+
+  /* ── STATS ── */
+  .stats-strip { display: flex; gap: 14px; margin-bottom: 32px; flex-wrap: wrap; }
+  .stat-card { background: var(--white); border-radius: 16px; padding: 16px 26px; flex: 1; min-width: 120px; box-shadow: var(--shadow); text-align: center; border-top: 3px solid var(--blush); }
+  .stat-card.contacted { border-top-color: var(--sage); }
+  .stat-card.pending   { border-top-color: var(--gold); }
+  .stat-number { font-family: 'Cormorant Garamond', serif; font-size: 2.3rem; font-weight: 600; color: var(--deep); line-height: 1; }
+  .stat-label  { font-size: .72rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+
+  /* ── FORM ── */
+  .form-card { background: var(--white); border-radius: 22px; padding: 36px; box-shadow: var(--shadow); margin-bottom: 28px; }
+  .form-card h2 { font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: 1.45rem; color: var(--deep); margin-bottom: 26px; display: flex; align-items: center; gap: 10px; }
+  .form-card h2::before { content:''; display:block; width:26px; height:2px; background:var(--rose); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; }
+  .form-grid-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 14px; align-items: end; margin-top: 0; }
+  .field label { display:block; font-size:.72rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
+  .field input, .field select {
+    width:100%; border:1.5px solid #e2d8d0; border-radius:10px;
+    padding:11px 15px; font-family:'Jost',sans-serif; font-size:.9rem;
+    color:var(--deep); background:var(--cream); transition:border-color .2s,box-shadow .2s; outline:none; appearance:none;
+  }
+  .field input:focus, .field select:focus { border-color:var(--rose); box-shadow:0 0 0 3px rgba(192,116,90,.11); }
+  .field input::placeholder { color:#bfb0a0; }
+  .btn-add {
+    background: var(--rose); color:#fff; border:none; border-radius:10px;
+    padding:11px 26px; font-family:'Jost',sans-serif; font-size:.86rem;
+    font-weight:500; letter-spacing:.08em; text-transform:uppercase;
+    cursor:pointer; white-space:nowrap; transition:all .2s;
+    box-shadow:0 4px 16px rgba(192,116,90,.28);
+  }
+  .btn-add:hover { background:#a85f47; transform:translateY(-1px); }
+  .btn-add:disabled { background:#d0b8a8; cursor:not-allowed; transform:none; }
+
+  /* ── CONTROLS ── */
+  .list-controls { display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap; align-items:center; }
+  .search-wrap { flex:1; min-width:200px; position:relative; }
+  .search-wrap input { width:100%; border:1.5px solid #e2d8d0; border-radius:10px; padding:10px 15px 10px 40px; font-family:'Jost',sans-serif; font-size:.87rem; color:var(--deep); background:var(--white); outline:none; transition:border-color .2s; }
+  .search-wrap input:focus { border-color:var(--rose); }
+  .search-wrap::before { content:'⌕'; position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:1.1rem; color:var(--muted); pointer-events:none; }
+  .filter-select { border:1.5px solid #e2d8d0; border-radius:10px; padding:10px 32px 10px 14px; font-family:'Jost',sans-serif; font-size:.82rem; color:var(--deep); background:var(--white); outline:none; cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; transition:border-color .2s; }
+  .filter-select:focus { border-color:var(--rose); }
+  .btn-refresh { background:var(--white); border:1.5px solid #d0c8bc; color:var(--deep); border-radius:10px; padding:10px 18px; font-family:'Jost',sans-serif; font-size:.8rem; font-weight:500; text-transform:uppercase; letter-spacing:.06em; cursor:pointer; display:flex; align-items:center; gap:7px; transition:all .2s; box-shadow:var(--shadow); }
+  .btn-refresh:hover { border-color:var(--rose); color:var(--rose); }
+
+  /* ── TABLE ── */
+  .table-wrap { background:var(--white); border-radius:20px; box-shadow:var(--shadow); overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  thead tr { background:var(--deep); color:var(--blush); }
+  th { padding:13px 18px; font-size:.7rem; font-weight:500; letter-spacing:.14em; text-transform:uppercase; text-align:left; }
+  tbody tr { border-bottom:1px solid #f0e8e0; transition:background .15s; }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:hover { background:#fdf8f4; }
+  td { padding:13px 18px; font-size:.88rem; color:var(--deep); vertical-align:middle; }
+  .td-place { color:var(--muted); font-size:.82rem; font-weight:300; }
+  .td-serial { color:var(--muted); font-size:.77rem; font-family:'Cormorant Garamond',serif; font-style:italic; }
+  .td-date { color:var(--muted); font-size:.75rem; }
+
+  /* RELATION BADGE */
+  .rel-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.7rem; font-weight:500; letter-spacing:.05em; text-transform:capitalize; border:1.5px solid transparent; }
+  .rel-bride    { background:#fce8f4; color:#a0407a; border-color:#f0c0dc; }
+  .rel-groom    { background:#e8f0fc; color:#3a60a8; border-color:#b8ccf0; }
+  .rel-family   { background:#fff4e0; color:#9a6010; border-color:#f0d898; }
+  .rel-friend   { background:#e8f8ec; color:#2a7a40; border-color:#a8dbb8; }
+  .rel-colleague{ background:#f0eafc; color:#6040a0; border-color:#d0b8f0; }
+  .rel-neighbor { background:#fdf0e8; color:#a05020; border-color:#f0c8a0; }
+  .rel-other    { background:#f0f0f0; color:#606060; border-color:#d8d8d8; }
+
+  /* STATUS */
+  .status-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 13px; border-radius:20px; font-size:.73rem; font-weight:500; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; border:none; transition:all .2s; white-space:nowrap; }
+  .status-badge.need { background:#fff4ec; color:#b06030; border:1.5px solid #f5d5b8; }
+  .status-badge.need:hover { background:#fce8d4; }
+  .status-badge.contacted { background:var(--light-sage); color:#4a7a50; border:1.5px solid #c0d8bc; }
+  .status-badge.contacted:hover { background:#d8edda; }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:currentColor; flex-shrink:0; }
+  .btn-delete { background:none; border:none; color:#c8b0a0; cursor:pointer; font-size:1rem; padding:4px 8px; border-radius:6px; transition:all .2s; line-height:1; }
+  .btn-delete:hover { color:#c0504a; background:#fde8e8; }
+
+  /* LOADING */
+  .loading-row td { text-align:center; padding:40px; color:var(--muted); font-style:italic; font-family:'Cormorant Garamond',serif; font-size:1.1rem; }
+  .spinner { display:inline-block; width:18px; height:18px; border:2px solid #e0c8b8; border-top-color:var(--rose); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:8px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* EMPTY */
+  .empty-state { text-align:center; padding:56px 20px; color:var(--muted); }
+  .empty-state .empty-icon { font-size:2.8rem; margin-bottom:14px; opacity:.4; }
+  .empty-state p { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.15rem; }
+
+  /* ── DUPLICATE MODAL ── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(58,34,24,.55); z-index:800; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
+  .modal-overlay.open { opacity:1; pointer-events:all; }
+  .modal-box { background:var(--white); border-radius:22px; padding:36px 32px 28px; max-width:400px; width:90%; box-shadow:0 24px 64px rgba(0,0,0,.22); transform:translateY(20px) scale(.97); transition:transform .28s cubic-bezier(.34,1.56,.64,1); text-align:center; }
+  .modal-overlay.open .modal-box { transform:translateY(0) scale(1); }
+  .modal-icon { font-size:2.4rem; margin-bottom:12px; }
+  .modal-title { font-family:'Cormorant Garamond',serif; font-size:1.55rem; font-weight:400; color:var(--deep); margin-bottom:8px; }
+  .modal-body { font-size:.88rem; color:var(--muted); line-height:1.6; margin-bottom:24px; }
+  .modal-body strong { color:var(--rose); }
+  .modal-actions { display:flex; gap:10px; justify-content:center; }
+  .btn-modal { border:none; border-radius:10px; padding:10px 24px; font-family:'Jost',sans-serif; font-size:.84rem; font-weight:500; cursor:pointer; transition:all .2s; }
+  .btn-modal.cancel { background:#f0e8e0; color:var(--muted); }
+  .btn-modal.cancel:hover { background:#e8ddd4; }
+  .btn-modal.confirm { background:var(--rose); color:#fff; box-shadow:0 4px 14px rgba(192,116,90,.28); }
+  .btn-modal.confirm:hover { background:#a85f47; }
+
+  /* ── SORTABLE HEADERS ── */
+  th.sortable { cursor:pointer; user-select:none; white-space:nowrap; }
+  th.sortable:hover { color:#fff; background:rgba(255,255,255,.08); }
+  th.sortable .sort-icon { display:inline-block; margin-left:5px; opacity:.4; font-size:.8em; transition:opacity .15s; }
+  th.sortable.asc  .sort-icon { opacity:1; }
+  th.sortable.desc .sort-icon { opacity:1; }
+  th.sortable.asc  .sort-icon::after { content:'↑'; }
+  th.sortable.desc .sort-icon::after { content:'↓'; }
+  th.sortable:not(.asc):not(.desc) .sort-icon::after { content:'↕'; }
+
+  /* ── DUPLICATE HIGHLIGHT on name input ── */
+  .field input.dup-warn { border-color:#e0904a !important; box-shadow:0 0 0 3px rgba(224,144,74,.15) !important; }
+  .dup-hint { font-size:.74rem; color:#c07030; margin-top:5px; display:none; }
+  .dup-hint.show { display:block; }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:28px; right:28px; background:var(--deep); color:var(--blush); padding:13px 22px; border-radius:12px; font-size:.84rem; font-weight:400; letter-spacing:.04em; box-shadow:0 8px 32px rgba(0,0,0,.25); transform:translateY(80px); opacity:0; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:999; pointer-events:none; }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast.error { background:#5a1a18; color:#f5c0be; }
+
+  @media (max-width:680px) {
+    header { padding:16px 18px; }
+    .logo { font-size:1.15rem; }
+    .page { padding:28px 14px; }
+    .form-grid { grid-template-columns:1fr; }
+    .btn-add { width:100%; }
+    th:nth-child(1), td:nth-child(1),
+    th:nth-child(5), td:nth-child(5) { display:none; }
+    #config-banner { padding:12px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CONFIG BANNER -->
+<div id="config-banner">
+  <span>🔗 Apps Script URL:</span>
+  <input type="text" id="script-url-input" placeholder="Paste your Google Apps Script Web App URL here…" />
+  <button class="btn-save-url" onclick="saveScriptUrl()">Save & Connect</button>
+  <span id="url-status"></span>
+</div>
+
+<!-- DUPLICATE WARNING MODAL -->
+<div class="modal-overlay" id="dup-modal">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">Duplicate Guest</div>
+    <div class="modal-body" id="dup-modal-body">A guest named <strong id="dup-name"></strong> already exists. Add anyway?</div>
+    <div class="modal-actions">
+      <button class="btn-modal cancel" onclick="closeDupModal()">Cancel</button>
+      <button class="btn-modal confirm" onclick="confirmAddDuplicate()">Add Anyway</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">Wedding <span>✦</span> Guests</div>
+  <nav>
+    <button class="nav-btn active" onclick="showPage('add', this)">Add Guest</button>
+    <button class="nav-btn" onclick="showPage('list', this)">Guest List</button>
+  </nav>
+</header>
+
+<!-- ══ PAGE: ADD ══ -->
+<div class="page active" id="page-add">
+  <div class="page-hero">
+    <h1>Add <em>Guests</em></h1>
+    <p>Enter guest details below. Data is saved live to Google Sheets — all family members see it instantly.</p>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stat-card"><div class="stat-number" id="stat-total">—</div><div class="stat-label">Total Guests</div></div>
+    <div class="stat-card contacted"><div class="stat-number" id="stat-contacted">—</div><div class="stat-label">Contacted</div></div>
+    <div class="stat-card pending"><div class="stat-number" id="stat-pending">—</div><div class="stat-label">Pending</div></div>
+  </div>
+
+    <div class="form-card">
+    <h2>New Guest</h2>
+    <div class="form-grid" style="margin-bottom:14px">
+      <div class="field">
+        <label>Full Name</label>
+        <input id="inp-name" type="text" placeholder="e.g. Priya Sharma" oninput="checkDupLive()" />
+        <div class="dup-hint" id="dup-hint">⚠ Similar name already in list</div>
+      </div>
+      <div class="field">
+        <label>Place / Location</label>
+        <input id="inp-place" type="text" placeholder="e.g. Chennai" />
+      </div>
+    </div>
+    <div class="form-grid-bottom">
+      <div class="field">
+        <label>Relation</label>
+        <select id="inp-relation">
+          <option value="">— Select —</option>
+          <option value="bride">Bride's Side</option>
+          <option value="groom">Groom's Side</option>
+          <option value="family">Family</option>
+          <option value="friend">Friend</option>
+          <option value="colleague">Colleague</option>
+          <option value="neighbor">Neighbor</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="inp-status">
+          <option value="need">Need to Contact</option>
+          <option value="contacted">Contacted</option>
+        </select>
+      </div>
+      <div class="field" style="grid-column:span 1"></div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn-add" id="btn-add-guest" onclick="addGuest()">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:.8rem;color:var(--muted);margin-top:4px;">
+    ✦ Data is stored in your Google Sheet — open it anytime to view or download as Excel.
+  </p>
+</div>
+
+<!-- ══ PAGE: LIST ══ -->
+<div class="page" id="page-list">
+  <div class="page-hero">
+    <h1>Guest <em>List</em></h1>
+    <p>Click any status badge to toggle it. All changes sync to Google Sheets immediately.</p>
+  </div>
+
+  <div class="list-controls">
+    <div class="search-wrap">
+      <input type="text" id="search-input" placeholder="Search name or place…" oninput="filterTable()" />
+    </div>
+    <select class="filter-select" id="filter-status" onchange="filterTable()">
+      <option value="all">All Statuses</option>
+      <option value="need">Need to Contact</option>
+      <option value="contacted">Contacted</option>
+    </select>
+    <select class="filter-select" id="filter-relation" onchange="filterTable()">
+      <option value="all">All Relations</option>
+      <option value="bride">Bride's Side</option>
+      <option value="groom">Groom's Side</option>
+      <option value="family">Family</option>
+      <option value="friend">Friend</option>
+      <option value="colleague">Colleague</option>
+      <option value="neighbor">Neighbor</option>
+      <option value="other">Other</option>
+    </select>
+    <select class="filter-select" id="sort-by" onchange="filterTable()">
+      <option value="default">Sort: Default</option>
+      <option value="name-asc">Name A → Z</option>
+      <option value="name-desc">Name Z → A</option>
+      <option value="place-asc">Place A → Z</option>
+      <option value="relation-asc">Relation A → Z</option>
+      <option value="status-need">Status: Pending First</option>
+      <option value="status-contacted">Status: Contacted First</option>
+      <option value="date-new">Date: Newest</option>
+      <option value="date-old">Date: Oldest</option>
+    </select>
+    <button class="btn-refresh" onclick="loadGuests(true)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+      Refresh
+    </button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th class="sortable" data-col="name" onclick="sortByCol('name')">Name <span class="sort-icon"></span></th>
+          <th class="sortable" data-col="place" onclick="sortByCol('place')">Place <span class="sort-icon"></span></th>
+          <th class="sortable" data-col="relation" onclick="sortByCol('relation')">Relation <span class="sort-icon"></span></th>
+          <th class="sortable" data-col="status" onclick="sortByCol('status')">Status <span class="sort-icon"></span></th>
+          <th class="sortable" data-col="addedOn" onclick="sortByCol('addedOn')">Added On <span class="sort-icon"></span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="guest-tbody">
+        <tr class="loading-row"><td colspan="7"><span class="spinner"></span>Loading…</td></tr>
+      </tbody>
+    </table>
+    <div class="empty-state" id="empty-state" style="display:none">
+      <div class="empty-icon">💌</div>
+      <p>No guests found. Add some from the first page!</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────
+const URL_KEY = 'wedding_script_url';
+let SCRIPT_URL = localStorage.getItem(URL_KEY) || '';
+let allGuests  = [];
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (SCRIPT_URL) {
+    document.getElementById('script-url-input').value = SCRIPT_URL;
+    document.getElementById('url-status').textContent  = '✓ Connected';
+    loadGuests();
+  }
+});
+
+function saveScriptUrl() {
+  const val = document.getElementById('script-url-input').value.trim();
+  if (!val.startsWith('https://script.google.com')) {
+    showToast('Please paste a valid Apps Script URL', true); return;
+  }
+  SCRIPT_URL = val;
+  localStorage.setItem(URL_KEY, SCRIPT_URL);
+  document.getElementById('url-status').textContent = '✓ Connected';
+  showToast('Connected! Loading guests…');
+  loadGuests();
+}
+
+// ── NAVIGATION ──────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'list') { filterTable(); }
+}
+
+// ── LOAD GUESTS ─────────────────────────────────────
+async function loadGuests(silent) {
+  if (!SCRIPT_URL) { showToast('Paste your Script URL first!', true); return; }
+  if (!silent) setTableLoading(true);
+
+  try {
+    const res  = await fetch(`${SCRIPT_URL}?action=getAll`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    allGuests = data.guests;
+    updateStats();
+    filterTable();
+    if (silent) showToast('Refreshed ✓');
+  } catch (err) {
+    showToast('Could not load data. Check your Script URL.', true);
+    setTableLoading(false);
+  }
+}
+
+function setTableLoading(on) {
+  const tbody = document.getElementById('guest-tbody');
+  if (on) tbody.innerHTML = `<tr class="loading-row"><td colspan="7"><span class="spinner"></span>Loading from Google Sheets…</td></tr>`;
+}
+
+// ── DUPLICATE CHECK ─────────────────────────────────
+let pendingAddPayload = null;
+
+function normName(s) { return s.trim().toLowerCase().replace(/\s+/g,' '); }
+
+function findDuplicate(name) {
+  const n = normName(name);
+  return allGuests.find(g => normName(g.name) === n);
+}
+
+function checkDupLive() {
+  const val  = document.getElementById('inp-name').value;
+  const hint = document.getElementById('dup-hint');
+  const inp  = document.getElementById('inp-name');
+  if (val.length > 1 && findDuplicate(val)) {
+    hint.classList.add('show');
+    inp.classList.add('dup-warn');
+  } else {
+    hint.classList.remove('show');
+    inp.classList.remove('dup-warn');
+  }
+}
+
+function openDupModal(name) {
+  document.getElementById('dup-name').textContent = name;
+  document.getElementById('dup-modal').classList.add('open');
+}
+function closeDupModal() {
+  document.getElementById('dup-modal').classList.remove('open');
+  pendingAddPayload = null;
+}
+async function confirmAddDuplicate() {
+  closeDupModal();
+  if (pendingAddPayload) await doAddGuest(pendingAddPayload);
+}
+
+// ── ADD GUEST ───────────────────────────────────────
+async function addGuest() {
+  if (!SCRIPT_URL) { showToast('Connect your Script URL first!', true); return; }
+
+  const name     = document.getElementById('inp-name').value.trim();
+  const place    = document.getElementById('inp-place').value.trim();
+  const relation = document.getElementById('inp-relation').value;
+  const status   = document.getElementById('inp-status').value;
+
+  if (!name) { showToast('Please enter a name!', true); return; }
+
+  // Duplicate check
+  const dup = findDuplicate(name);
+  if (dup) {
+    pendingAddPayload = { name, place, relation, status };
+    openDupModal(dup.name);
+    return;
+  }
+
+  await doAddGuest({ name, place, relation, status });
+}
+
+async function doAddGuest({ name, place, relation, status }) {
+  const btn = document.getElementById('btn-add-guest');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  try {
+    const res  = await postAction({ action:'add', name, place, relation, status });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    allGuests.push({ id: data.id, name, place, relation, status, addedOn: new Date().toLocaleDateString('en-IN') });
+    updateStats();
+    filterTable();
+
+    document.getElementById('inp-name').value  = '';
+    document.getElementById('inp-place').value = '';
+    document.getElementById('inp-relation').value = '';
+    document.getElementById('inp-name').classList.remove('dup-warn');
+    document.getElementById('dup-hint').classList.remove('show');
+    document.getElementById('inp-name').focus();
+    showToast(`${name} added ✓`);
+  } catch (err) {
+    showToast('Failed to add guest. Try again.', true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '+ Add';
+  }
+}
+
+// ── TOGGLE STATUS ───────────────────────────────────
+async function toggleStatus(id, btn) {
+  const g = allGuests.find(x => x.id == id);
+  if (!g) return;
+
+  const newStatus = g.status === 'need' ? 'contacted' : 'need';
+  btn.disabled = true;
+
+  try {
+    const res  = await postAction({ action:'updateStatus', id, status: newStatus });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    g.status = newStatus;
+    updateStats();
+    filterTable();
+    showToast(`${g.name} → ${newStatus === 'contacted' ? 'Contacted ✓' : 'Need to Contact'}`);
+  } catch {
+    showToast('Update failed. Try again.', true);
+    btn.disabled = false;
+  }
+}
+
+// ── DELETE ──────────────────────────────────────────
+async function deleteGuest(id) {
+  const g = allGuests.find(x => x.id == id);
+  if (!g || !confirm(`Remove "${g.name}" from the list?`)) return;
+
+  try {
+    const res  = await postAction({ action:'delete', id });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    allGuests = allGuests.filter(x => x.id != id);
+    updateStats();
+    filterTable();
+    showToast(`${g.name} removed`);
+  } catch {
+    showToast('Delete failed. Try again.', true);
+  }
+}
+
+// ── SORT STATE ──────────────────────────────────────
+let sortCol = null, sortDir = 'asc';
+
+function sortByCol(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col; sortDir = 'asc';
+  }
+  // sync dropdown to default so headers take over
+  document.getElementById('sort-by').value = 'default';
+  // update header classes
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.classList.remove('asc','desc');
+    if (th.dataset.col === col) th.classList.add(sortDir);
+  });
+  filterTable();
+}
+
+// ── RENDER TABLE ────────────────────────────────────
+function relLabel(r) {
+  const map = { bride:"Bride's Side", groom:"Groom's Side", family:"Family", friend:"Friend", colleague:"Colleague", neighbor:"Neighbor", other:"Other" };
+  return map[r] || r || '—';
+}
+
+function filterTable() {
+  const q         = (document.getElementById('search-input').value || '').toLowerCase();
+  const filter    = document.getElementById('filter-status').value;
+  const filterRel = document.getElementById('filter-relation').value;
+  const sortBy    = document.getElementById('sort-by').value;
+  const empty     = document.getElementById('empty-state');
+  const tbody     = document.getElementById('guest-tbody');
+
+  let filtered = allGuests.filter(g => {
+    const mq  = g.name.toLowerCase().includes(q) || (g.place||'').toLowerCase().includes(q) || (g.relation||'').toLowerCase().includes(q);
+    const mf  = filter === 'all' || g.status === filter;
+    const mr  = filterRel === 'all' || (g.relation||'') === filterRel;
+    return mq && mf && mr;
+  });
+
+  // ── Sorting ──
+  const sortFn = sortCol && sortBy === 'default'
+    ? (a, b) => {
+        let va = (a[sortCol]||'').toString().toLowerCase();
+        let vb = (b[sortCol]||'').toString().toLowerCase();
+        return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+      }
+    : (() => {
+        switch (sortBy) {
+          case 'name-asc':         return (a,b) => a.name.localeCompare(b.name);
+          case 'name-desc':        return (a,b) => b.name.localeCompare(a.name);
+          case 'place-asc':        return (a,b) => (a.place||'').localeCompare(b.place||'');
+          case 'relation-asc':     return (a,b) => (a.relation||'').localeCompare(b.relation||'');
+          case 'status-need':      return (a,b) => (a.status==='need'?-1:1) - (b.status==='need'?-1:1);
+          case 'status-contacted': return (a,b) => (a.status==='contacted'?-1:1) - (b.status==='contacted'?-1:1);
+          case 'date-new':         return (a,b) => (b.id||0) - (a.id||0);
+          case 'date-old':         return (a,b) => (a.id||0) - (b.id||0);
+          default:                 return null;
+        }
+      })();
+
+  if (sortFn) filtered = [...filtered].sort(sortFn);
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map((g, i) => `
+    <tr>
+      <td class="td-serial">${i+1}</td>
+      <td><strong>${esc(g.name)}</strong></td>
+      <td class="td-place">${esc(g.place || '—')}</td>
+      <td>${g.relation ? `<span class="rel-badge rel-${esc(g.relation)}">${esc(relLabel(g.relation))}</span>` : '<span style="color:#ccc">—</span>'}</td>
+      <td>
+        <button class="status-badge ${g.status}" onclick="toggleStatus('${g.id}', this)">
+          <span class="status-dot"></span>
+          ${g.status === 'need' ? 'Need to Contact' : 'Contacted'}
+        </button>
+      </td>
+      <td class="td-date">${esc(g.addedOn || '')}</td>
+      <td><button class="btn-delete" onclick="deleteGuest('${g.id}')" title="Remove">✕</button></td>
+    </tr>
+  `).join('');
+}
+
+// ── STATS ───────────────────────────────────────────
+function updateStats() {
+  const total     = allGuests.length;
+  const contacted = allGuests.filter(g => g.status === 'contacted').length;
+  document.getElementById('stat-total').textContent     = total;
+  document.getElementById('stat-contacted').textContent = contacted;
+  document.getElementById('stat-pending').textContent   = total - contacted;
+}
+
+// ── HELPERS ─────────────────────────────────────────
+async function postAction(body) {
+  return fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(body)
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '') + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+document.getElementById('dup-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeDupModal();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeDupModal();
+  if (e.key === 'Enter' && document.getElementById('page-add').classList.contains('active')) addGuest();
+});
+</script>
+</body>
+</html>
