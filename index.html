@@ -483,19 +483,48 @@ async function loadGuests(){
 async function addGuest(){
 
   const name =
-    document.getElementById('name').value.trim();
+    document.getElementById('name')
+      .value
+      .trim();
 
   const place =
-    document.getElementById('place').value.trim();
+    document.getElementById('place')
+      .value
+      .trim();
 
   const relation =
-    document.getElementById('relation').value;
+    document.getElementById('relation')
+      .value;
 
   const status =
-    document.getElementById('status').value;
+    document.getElementById('status')
+      .value;
 
+  // EMPTY VALIDATION
   if(!name){
-    showToast('Please enter guest name', true);
+
+    showToast(
+      'Please enter guest name',
+      true
+    );
+
+    return;
+  }
+
+  // DUPLICATE CHECK (CASE-INSENSITIVE)
+  const duplicate = guests.find(g =>
+    g.name &&
+    g.name.trim().toLowerCase() ===
+    name.toLowerCase()
+  );
+
+  if(duplicate){
+
+    showToast(
+      'This guest is already on your list!',
+      true
+    );
+
     return;
   }
 
@@ -521,10 +550,13 @@ async function addGuest(){
       throw new Error(data.error);
     }
 
+    // CLEAR INPUTS
     document.getElementById('name').value = '';
     document.getElementById('place').value = '';
 
-    showToast('Guest added ✓');
+    showToast(
+      'Guest added successfully ✓'
+    );
 
     loadGuests();
 
@@ -532,12 +564,14 @@ async function addGuest(){
 
     console.error(err);
 
-    showToast('Failed adding guest', true);
+    showToast(
+      'Failed adding guest',
+      true
+    );
 
   }
 }
-
-// RENDER TABLE
+  // RENDER TABLE
 function renderTable(){
 
   const tbody =
