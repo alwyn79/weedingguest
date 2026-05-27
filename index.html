@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <title>Wedding Guest Tracker</title>
 
@@ -15,7 +15,7 @@
   --rose:#c0745a;
   --deep:#3a2218;
   --gold:#b8975a;
-  --white:#fff;
+  --white:#ffffff;
   --shadow:0 4px 24px rgba(0,0,0,.08);
 }
 
@@ -43,7 +43,7 @@ header{
 
 .logo{
   color:#f0d5c6;
-  font-size:1.6rem;
+  font-size:1.7rem;
   font-family:'Cormorant Garamond',serif;
   font-style:italic;
 }
@@ -60,12 +60,12 @@ nav{
 .nav-btn{
   border:none;
   background:none;
-  color:#d5b5a0;
+  color:#d7b9a5;
   padding:10px 18px;
   border-radius:30px;
   cursor:pointer;
-  text-transform:uppercase;
   font-size:.8rem;
+  text-transform:uppercase;
 }
 
 .nav-btn.active{
@@ -73,11 +73,11 @@ nav{
   color:#fff;
 }
 
-/* PAGES */
+/* PAGE */
 
 .page{
   display:none;
-  max-width:950px;
+  max-width:1000px;
   margin:auto;
   padding:40px 20px;
 }
@@ -87,7 +87,7 @@ nav{
 }
 
 .page h1{
-  font-size:2.5rem;
+  font-size:2.7rem;
   margin-bottom:30px;
   font-family:'Cormorant Garamond',serif;
   font-weight:300;
@@ -101,16 +101,16 @@ nav{
 
 .stats{
   display:flex;
-  gap:16px;
-  margin-bottom:30px;
+  gap:18px;
   flex-wrap:wrap;
+  margin-bottom:30px;
 }
 
 .stat{
-  background:#fff;
   flex:1;
   min-width:180px;
-  border-radius:18px;
+  background:#fff;
+  border-radius:20px;
   padding:24px;
   text-align:center;
   box-shadow:var(--shadow);
@@ -123,18 +123,20 @@ nav{
 
 .stat-label{
   font-size:.75rem;
-  text-transform:uppercase;
   color:#888;
+  text-transform:uppercase;
 }
 
-/* FORM */
+/* CARD */
 
 .card{
   background:#fff;
-  border-radius:22px;
+  border-radius:24px;
   padding:32px;
   box-shadow:var(--shadow);
 }
+
+/* FORM */
 
 .grid{
   display:grid;
@@ -154,26 +156,28 @@ nav{
 .field select{
   width:100%;
   padding:12px;
-  border:1px solid #ddd;
   border-radius:10px;
+  border:1px solid #ddd;
   background:#faf7f5;
 }
 
 .btn{
+  margin-top:20px;
   background:var(--rose);
   color:#fff;
   border:none;
-  padding:12px 22px;
+  padding:12px 24px;
   border-radius:10px;
   cursor:pointer;
 }
 
-/* TABLE */
+/* CONTROLS */
 
 .controls{
   display:flex;
   gap:12px;
   margin-bottom:20px;
+  flex-wrap:wrap;
 }
 
 .controls input,
@@ -186,6 +190,8 @@ nav{
 .controls input{
   flex:1;
 }
+
+/* TABLE */
 
 .table-wrap{
   background:#fff;
@@ -208,6 +214,7 @@ th{
   padding:14px;
   text-align:left;
   font-size:.75rem;
+  text-transform:uppercase;
 }
 
 td{
@@ -219,6 +226,7 @@ td{
   border:none;
   padding:8px 12px;
   border-radius:20px;
+  background:#f5f5f5;
   cursor:pointer;
 }
 
@@ -238,8 +246,8 @@ td{
   right:20px;
   background:#333;
   color:#fff;
-  padding:14px 20px;
-  border-radius:10px;
+  padding:14px 22px;
+  border-radius:12px;
   opacity:0;
   transform:translateY(40px);
   transition:.3s;
@@ -326,12 +334,12 @@ td{
 
       <div class="field">
         <label>Name</label>
-        <input type="text" id="name">
+        <input type="text" id="name" placeholder="Guest Name">
       </div>
 
       <div class="field">
         <label>Place</label>
-        <input type="text" id="place">
+        <input type="text" id="place" placeholder="Location">
       </div>
 
       <div class="field">
@@ -356,8 +364,6 @@ td{
 
     </div>
 
-    <br>
-
     <button class="btn" onclick="addGuest()">
       + Add Guest
     </button>
@@ -376,8 +382,8 @@ td{
 
     <input
       type="text"
-      placeholder="Search..."
       id="search"
+      placeholder="Search guests..."
       oninput="renderTable()"
     >
 
@@ -415,16 +421,17 @@ td{
 
 <script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWI0_Xp6nR4WsUYR7muF-rWyaAJdpNUJ28UA-wymiW2RLQ-rGOoZLRZK5y_UxpjZ_M/exec";
+const SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbxWI0_Xp6nR4WsUYR7muF-rWyaAJdpNUJ28UA-wymiW2RLQ-rGOoZLRZK5y_UxpjZ_M/exec";
 
 let guests = [];
 
-// LOAD
-window.onload = () => {
+// PAGE LOAD
+window.onload = function(){
   loadGuests();
 };
 
-// PAGE SWITCH
+// NAVIGATION
 function showPage(id, btn){
 
   document.querySelectorAll('.page')
@@ -443,7 +450,7 @@ function showPage(id, btn){
   }
 }
 
-// LOAD DATA
+// LOAD GUESTS
 async function loadGuests(){
 
   try{
@@ -452,6 +459,10 @@ async function loadGuests(){
       await fetch(`${SCRIPT_URL}?action=getAll`);
 
     const data = await res.json();
+
+    if(!data.success){
+      throw new Error(data.error);
+    }
 
     guests = data.guests || [];
 
@@ -468,7 +479,7 @@ async function loadGuests(){
   }
 }
 
-// ADD
+// ADD GUEST
 async function addGuest(){
 
   const name =
@@ -484,13 +495,13 @@ async function addGuest(){
     document.getElementById('status').value;
 
   if(!name){
-    showToast('Enter guest name', true);
+    showToast('Please enter guest name', true);
     return;
   }
 
   try{
 
-    await fetch(SCRIPT_URL,{
+    const res = await fetch(SCRIPT_URL,{
       method:'POST',
       headers:{
         'Content-Type':'text/plain'
@@ -503,6 +514,12 @@ async function addGuest(){
         status
       })
     });
+
+    const data = await res.json();
+
+    if(!data.success){
+      throw new Error(data.error);
+    }
 
     document.getElementById('name').value = '';
     document.getElementById('place').value = '';
@@ -520,7 +537,7 @@ async function addGuest(){
   }
 }
 
-// TABLE
+// RENDER TABLE
 function renderTable(){
 
   const tbody =
@@ -567,7 +584,7 @@ function renderTable(){
             value="need"
             ${g.status === 'need' ? 'selected' : ''}
           >
-            Need
+            Need to Contact
           </option>
 
           <option
@@ -602,7 +619,7 @@ async function changeStatus(id, status){
 
   try{
 
-    await fetch(SCRIPT_URL,{
+    const res = await fetch(SCRIPT_URL,{
       method:'POST',
       headers:{
         'Content-Type':'text/plain'
@@ -614,6 +631,12 @@ async function changeStatus(id, status){
       })
     });
 
+    const data = await res.json();
+
+    if(!data.success){
+      throw new Error(data.error);
+    }
+
     showToast('Status updated ✓');
 
     loadGuests();
@@ -622,12 +645,12 @@ async function changeStatus(id, status){
 
     console.error(err);
 
-    showToast('Failed updating', true);
+    showToast('Failed updating status', true);
 
   }
 }
 
-// DELETE
+// DELETE GUEST
 async function deleteGuest(id){
 
   if(!confirm('Delete guest?')){
@@ -636,7 +659,7 @@ async function deleteGuest(id){
 
   try{
 
-    await fetch(SCRIPT_URL,{
+    const res = await fetch(SCRIPT_URL,{
       method:'POST',
       headers:{
         'Content-Type':'text/plain'
@@ -646,6 +669,12 @@ async function deleteGuest(id){
         id
       })
     });
+
+    const data = await res.json();
+
+    if(!data.success){
+      throw new Error(data.error);
+    }
 
     showToast('Guest deleted');
 
@@ -660,7 +689,7 @@ async function deleteGuest(id){
   }
 }
 
-// STATS
+// UPDATE STATS
 function updateStats(){
 
   const total = guests.length;
@@ -668,14 +697,29 @@ function updateStats(){
   const contacted =
     guests.filter(g => g.status === 'contacted').length;
 
-  document.getElementById('totalGuests')
-    .textContent = total;
+  const pending = total - contacted;
 
-  document.getElementById('contactedGuests')
-    .textContent = contacted;
+  const totalEl =
+    document.getElementById('totalGuests');
 
-  document.getElementById('pendingGuests')
-    .textContent = total - contacted;
+  const contactedEl =
+    document.getElementById('contactedGuests');
+
+  const pendingEl =
+    document.getElementById('pendingGuests');
+
+  if(totalEl){
+    totalEl.textContent = total;
+  }
+
+  if(contactedEl){
+    contactedEl.textContent = contacted;
+  }
+
+  if(pendingEl){
+    pendingEl.textContent = pending;
+  }
+
 }
 
 // TOAST
@@ -683,7 +727,8 @@ let toastTimer;
 
 function showToast(msg, error){
 
-  const t = document.getElementById('toast');
+  const t =
+    document.getElementById('toast');
 
   t.textContent = msg;
 
