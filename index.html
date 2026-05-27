@@ -1,449 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wedding Guest Tracker</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --cream:#faf6f0;
+  --blush:#e8c4b0;
+  --rose:#c0745a;
+  --deep:#3a2218;
+  --gold:#b8975a;
+  --sage:#7a9478;
+  --light-sage:#e8efe7;
+  --muted:#8a7060;
+  --white:#fff;
+  --shadow:0 4px 32px rgba(58,34,24,0.08);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Jost',sans-serif;
+  background:var(--cream);
+  color:var(--deep);
+}
+
+/* HEADER */
+header{
+  background:var(--deep);
+  padding:24px 40px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.logo{
+  font-family:'Cormorant Garamond',serif;
+  color:var(--blush);
+  font-size:1.7rem;
+  font-style:italic;
+}
+
+.logo span{
+  color:var(--gold);
+}
+
+nav{
+  display:flex;
+  gap:8px;
+}
+
+.nav-btn{
+  border:none;
+  background:none;
+  color:#ccb7aa;
+  padding:10px 18px;
+  border-radius:30px;
+  cursor:pointer;
+  font-size:.82rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.nav-btn.active{
+  background:var(--rose);
+  color:#fff;
+}
+
+/* PAGES */
+.page{
+  display:none;
+  max-width:950px;
+  margin:auto;
+  padding:40px 20px;
+}
+
+.page.active{
+  display:block;
+}
+
+.page-hero{
+  margin-bottom:30px;
+}
+
+.page-hero h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.8rem;
+  font-weight:300;
+}
+
+.page-hero em{
+  color:var(--rose);
+}
+
+/* STATS */
+.stats-strip{
+  display:flex;
+  gap:16px;
+  margin-bottom:30px;
+  flex-wrap:wrap;
+}
+
+.stat-card{
+  background:#fff;
+  border-radius:18px;
+  padding:20px;
+  flex:1;
+  min-width:160px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+
+.stat-number{
+  font-size:2.4rem;
+  font-family:'Cormorant Garamond',serif;
+}
+
+.stat-label{
+  font-size:.75rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+/* FORM */
+.form-card{
+  background:#fff;
+  border-radius:24px;
+  padding:34px;
+  box-shadow:var(--shadow);
+}
+
+.form-card h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.5rem;
+  margin-bottom:24px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-bottom:16px;
+}
+
+.form-grid-bottom{
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:16px;
+  align-items:end;
+}
+
+.field label{
+  display:block;
+  margin-bottom:8px;
+  font-size:.75rem;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
+.field input,
+.field select{
+  width:100%;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:12px;
+  background:var(--cream);
+  font-family:'Jost',sans-serif;
+}
+
+.btn-add{
+  background:var(--rose);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:12px 28px;
+  cursor:pointer;
+}
+
+/* TABLE */
+.table-wrap{
+  background:#fff;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+thead{
+  background:var(--deep);
+  color:var(--blush);
+}
+
+th{
+  padding:14px;
+  text-align:left;
+  font-size:.75rem;
+  text-transform:uppercase;
+}
+
+td{
+  padding:14px;
+  border-bottom:1px solid #f0ece8;
+}
+
+.status-badge{
+  border:none;
+  border-radius:20px;
+  padding:7px 14px;
+  cursor:pointer;
+  font-size:.72rem;
+}
+
+.status-badge.need{
+  background:#fff0e5;
+  color:#a85f47;
+}
+
+.status-badge.contacted{
+  background:#e6f5e7;
+  color:#3e7d4c;
+}
+
+.btn-delete{
+  border:none;
+  background:none;
+  color:#c96a5c;
+  cursor:pointer;
+  font-size:1rem;
+}
+
+/* SEARCH */
+.list-controls{
+  display:flex;
+  gap:14px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+
+.search-wrap{
+  flex:1;
+}
+
+.search-wrap input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+.filter-select{
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+/* TOAST */
+.toast{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:var(--deep);
+  color:#fff;
+  padding:14px 22px;
+  border-radius:12px;
+  opacity:0;
+  transform:translateY(50px);
+  transition:.3s;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.toast.error{
+  background:#7a2d22;
+}
+
+/* MOBILE */
+@media(max-width:700px){
+
+  .form-grid,
+  .form-grid-bottom{
+    grid-template-columns:1fr;
+  }
+
+  header{
+    padding:18px;
+  }
+
+  .page{
+    padding:24px 14px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    Wedding <span>✦</span> Guests
+  </div>
+
+  <nav>
+    <button class="nav-btn active" onclick="showPage('add', this)">
+      Add Guest
+    </button>
+
+    <button class="nav-btn" onclick="showPage('list', this)">
+      Guest List
+    </button>
+  </nav>
+</header>
+
+<!-- ADD PAGE -->
+<div class="page active" id="page-add">
+
+  <div class="page-hero">
+    <h1>Add <em>Guests</em></h1>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stat-card">
+      <div class="stat-number" id="stat-total">0</div>
+      <div class="stat-label">Total Guests</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-number" id="stat-contacted">0</div>
+      <div class="stat-label">Contacted</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-number" id="stat-pending">0</div>
+      <div class="stat-label">Pending</div>
+    </div>
+  </div>
+
+  <div class="form-card">
+
+    <h2>New Guest</h2>
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="inp-name" placeholder="Guest Name">
+      </div>
+
+      <div class="field">
+        <label>Place</label>
+        <input type="text" id="inp-place" placeholder="Location">
+      </div>
+
+    </div>
+
+    <div class="form-grid-bottom">
+
+      <div class="field">
+        <label>Relation</label>
+
+        <select id="inp-relation">
+          <option value="family">Family</option>
+          <option value="friend">Friend</option>
+          <option value="colleague">Colleague</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Status</label>
+
+        <select id="inp-status">
+          <option value="need">Need to Contact</option>
+          <option value="contacted">Contacted</option>
+        </select>
+      </div>
+
+      <button class="btn-add" onclick="addGuest()">
+        + Add
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- LIST PAGE -->
+<div class="page" id="page-list">
+
+  <div class="page-hero">
+    <h1>Guest <em>List</em></h1>
+  </div>
+
+  <div class="list-controls">
+
+    <div class="search-wrap">
+      <input type="text" id="search-input" placeholder="Search..." oninput="filterTable()">
+    </div>
+
+    <select class="filter-select" id="filter-status" onchange="filterTable()">
+      <option value="all">All</option>
+      <option value="need">Need</option>
+      <option value="contacted">Contacted</option>
+    </select>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Place</th>
+          <th>Relation</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody id="guest-tbody"></tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-// ── CONFIG ──────────────────────────────────────────
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWI0_Xp6nR4WsUYR7muF-rWyaAJdpNUJ28UA-wymiW2RLQ-rGOoZLRZK5y_UxpjZ_M/exec";
 
 let allGuests = [];
 
-// ── INITIAL LOAD ────────────────────────────────────
+// LOAD
 window.addEventListener('DOMContentLoaded', () => {
   loadGuests();
 });
 
-// ── NAVIGATION ──────────────────────────────────────
-function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
+// NAVIGATION
+function showPage(id, btn){
+
+  document.querySelectorAll('.page')
+    .forEach(p => p.classList.remove('active'));
+
+  document.querySelectorAll('.nav-btn')
+    .forEach(b => b.classList.remove('active'));
+
+  document.getElementById('page-' + id)
+    .classList.add('active');
+
   btn.classList.add('active');
 
-  if (id === 'list') {
+  if(id === 'list'){
     filterTable();
   }
 }
 
-// ── LOAD GUESTS ─────────────────────────────────────
-async function loadGuests(silent) {
-  if (!silent) setTableLoading(true);
+// LOAD GUESTS
+async function loadGuests(){
 
-  try {
+  try{
+
     const res = await fetch(`${SCRIPT_URL}?action=getAll`);
+
     const data = await res.json();
 
-    if (!data.success) {
+    if(!data.success){
       throw new Error(data.error);
     }
 
     allGuests = data.guests || [];
 
     updateStats();
+
     filterTable();
 
-    if (silent) {
-      showToast('Refreshed ✓');
-    }
+  }catch(err){
 
-  } catch (err) {
     console.error(err);
-    showToast('Could not load guest data.', true);
-    setTableLoading(false);
+
+    showToast('Failed loading guests', true);
+
   }
 }
 
-function setTableLoading(on) {
-  const tbody = document.getElementById('guest-tbody');
+// ADD GUEST
+async function addGuest(){
 
-  if (on) {
-    tbody.innerHTML = `
-      <tr class="loading-row">
-        <td colspan="7">
-          <span class="spinner"></span>
-          Loading from Google Sheets…
-        </td>
-      </tr>
-    `;
-  }
-}
-
-// ── DUPLICATE CHECK ─────────────────────────────────
-let pendingAddPayload = null;
-
-function normName(s) {
-  return s.trim().toLowerCase().replace(/\s+/g, ' ');
-}
-
-function findDuplicate(name) {
-  const n = normName(name);
-  return allGuests.find(g => normName(g.name) === n);
-}
-
-function checkDupLive() {
-  const val = document.getElementById('inp-name').value;
-  const hint = document.getElementById('dup-hint');
-  const inp = document.getElementById('inp-name');
-
-  if (val.length > 1 && findDuplicate(val)) {
-    hint.classList.add('show');
-    inp.classList.add('dup-warn');
-  } else {
-    hint.classList.remove('show');
-    inp.classList.remove('dup-warn');
-  }
-}
-
-function openDupModal(name) {
-  document.getElementById('dup-name').textContent = name;
-  document.getElementById('dup-modal').classList.add('open');
-}
-
-function closeDupModal() {
-  document.getElementById('dup-modal').classList.remove('open');
-  pendingAddPayload = null;
-}
-
-async function confirmAddDuplicate() {
-  closeDupModal();
-
-  if (pendingAddPayload) {
-    await doAddGuest(pendingAddPayload);
-  }
-}
-
-// ── ADD GUEST ───────────────────────────────────────
-async function addGuest() {
   const name = document.getElementById('inp-name').value.trim();
+
   const place = document.getElementById('inp-place').value.trim();
+
   const relation = document.getElementById('inp-relation').value;
+
   const status = document.getElementById('inp-status').value;
 
-  if (!name) {
-    showToast('Please enter a guest name!', true);
+  if(!name){
+    showToast('Enter guest name', true);
     return;
   }
 
-  const dup = findDuplicate(name);
+  try{
 
-  if (dup) {
-    pendingAddPayload = { name, place, relation, status };
-    openDupModal(dup.name);
-    return;
-  }
-
-  await doAddGuest({ name, place, relation, status });
-}
-
-async function doAddGuest({ name, place, relation, status }) {
-  const btn = document.getElementById('btn-add-guest');
-
-  btn.disabled = true;
-  btn.textContent = 'Saving…';
-
-  try {
-    const res = await postAction({
-      action: 'add',
-      name,
-      place,
-      relation,
-      status
+    const res = await fetch(SCRIPT_URL, {
+      method:'POST',
+      headers:{
+        'Content-Type':'text/plain'
+      },
+      body:JSON.stringify({
+        action:'add',
+        name,
+        place,
+        relation,
+        status
+      })
     });
 
     const data = await res.json();
 
-    if (!data.success) {
+    if(!data.success){
       throw new Error(data.error);
     }
 
-    allGuests.push({
-      id: data.id,
-      name,
-      place,
-      relation,
-      status,
-      addedOn: new Date().toLocaleDateString('en-IN')
-    });
-
-    updateStats();
-    filterTable();
+    showToast('Guest added ✓');
 
     document.getElementById('inp-name').value = '';
     document.getElementById('inp-place').value = '';
-    document.getElementById('inp-relation').value = '';
-    document.getElementById('inp-status').value = 'need';
 
-    document.getElementById('inp-name').classList.remove('dup-warn');
-    document.getElementById('dup-hint').classList.remove('show');
+    loadGuests();
 
-    document.getElementById('inp-name').focus();
+  }catch(err){
 
-    showToast(`${name} added ✓`);
-
-  } catch (err) {
     console.error(err);
-    showToast('Failed to add guest.', true);
 
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '+ Add';
+    showToast('Failed adding guest', true);
+
   }
 }
 
-// ── TOGGLE STATUS ───────────────────────────────────
-async function toggleStatus(id, btn) {
-  const g = allGuests.find(x => x.id == id);
-
-  if (!g) return;
-
-  const newStatus = g.status === 'need'
-    ? 'contacted'
-    : 'need';
-
-  btn.disabled = true;
-
-  try {
-    const res = await postAction({
-      action: 'updateStatus',
-      id,
-      status: newStatus
-    });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      throw new Error(data.error);
-    }
-
-    g.status = newStatus;
-
-    updateStats();
-    filterTable();
-
-    showToast(
-      `${g.name} → ${
-        newStatus === 'contacted'
-          ? 'Contacted ✓'
-          : 'Need to Contact'
-      }`
-    );
-
-  } catch (err) {
-    console.error(err);
-    showToast('Update failed.', true);
-    btn.disabled = false;
-  }
-}
-
-// ── DELETE ──────────────────────────────────────────
-async function deleteGuest(id) {
-  const g = allGuests.find(x => x.id == id);
-
-  if (!g) return;
-
-  if (!confirm(`Remove "${g.name}" from the list?`)) {
-    return;
-  }
-
-  try {
-    const res = await postAction({
-      action: 'delete',
-      id
-    });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      throw new Error(data.error);
-    }
-
-    allGuests = allGuests.filter(x => x.id != id);
-
-    updateStats();
-    filterTable();
-
-    showToast(`${g.name} removed`);
-
-  } catch (err) {
-    console.error(err);
-    showToast('Delete failed.', true);
-  }
-}
-
-// ── SORT STATE ──────────────────────────────────────
-let sortCol = null;
-let sortDir = 'asc';
-
-function sortByCol(col) {
-  if (sortCol === col) {
-    sortDir = sortDir === 'asc'
-      ? 'desc'
-      : 'asc';
-  } else {
-    sortCol = col;
-    sortDir = 'asc';
-  }
-
-  document.getElementById('sort-by').value = 'default';
-
-  document.querySelectorAll('th.sortable').forEach(th => {
-    th.classList.remove('asc', 'desc');
-
-    if (th.dataset.col === col) {
-      th.classList.add(sortDir);
-    }
-  });
-
-  filterTable();
-}
-
-// ── RENDER TABLE ────────────────────────────────────
-function relLabel(r) {
-  const map = {
-    bride: "Bride's Side",
-    groom: "Groom's Side",
-    family: "Family",
-    friend: "Friend",
-    colleague: "Colleague",
-    neighbor: "Neighbor",
-    other: "Other"
-  };
-
-  return map[r] || r || '—';
-}
-
-function filterTable() {
-  const q = (document.getElementById('search-input').value || '').toLowerCase();
-
-  const filter = document.getElementById('filter-status').value;
-
-  const filterRel = document.getElementById('filter-relation').value;
-
-  const sortBy = document.getElementById('sort-by').value;
-
-  const empty = document.getElementById('empty-state');
+// FILTER
+function filterTable(){
 
   const tbody = document.getElementById('guest-tbody');
 
+  const search = document.getElementById('search-input')
+    .value
+    .toLowerCase();
+
+  const status = document.getElementById('filter-status').value;
+
   let filtered = allGuests.filter(g => {
-    const mq =
-      g.name.toLowerCase().includes(q) ||
-      (g.place || '').toLowerCase().includes(q) ||
-      (g.relation || '').toLowerCase().includes(q);
 
-    const mf = filter === 'all' || g.status === filter;
+    const matchSearch =
+      g.name.toLowerCase().includes(search) ||
+      (g.place || '').toLowerCase().includes(search);
 
-    const mr = filterRel === 'all' || (g.relation || '') === filterRel;
+    const matchStatus =
+      status === 'all' || g.status === status;
 
-    return mq && mf && mr;
+    return matchSearch && matchStatus;
+
   });
 
-  const sortFn = sortCol && sortBy === 'default'
-    ? (a, b) => {
-        let va = (a[sortCol] || '').toString().toLowerCase();
-        let vb = (b[sortCol] || '').toString().toLowerCase();
-
-        return sortDir === 'asc'
-          ? va.localeCompare(vb)
-          : vb.localeCompare(va);
-      }
-    : (() => {
-        switch (sortBy) {
-          case 'name-asc':
-            return (a, b) => a.name.localeCompare(b.name);
-
-          case 'name-desc':
-            return (a, b) => b.name.localeCompare(a.name);
-
-          case 'place-asc':
-            return (a, b) => (a.place || '').localeCompare(b.place || '');
-
-          case 'relation-asc':
-            return (a, b) => (a.relation || '').localeCompare(b.relation || '');
-
-          case 'status-need':
-            return (a, b) =>
-              (a.status === 'need' ? -1 : 1) -
-              (b.status === 'need' ? -1 : 1);
-
-          case 'status-contacted':
-            return (a, b) =>
-              (a.status === 'contacted' ? -1 : 1) -
-              (b.status === 'contacted' ? -1 : 1);
-
-          case 'date-new':
-            return (a, b) => (b.id || 0) - (a.id || 0);
-
-          case 'date-old':
-            return (a, b) => (a.id || 0) - (b.id || 0);
-
-          default:
-            return null;
-        }
-      })();
-
-  if (sortFn) {
-    filtered = [...filtered].sort(sortFn);
-  }
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-
-  empty.style.display = 'none';
-
-  tbody.innerHTML = filtered.map((g, i) => `
+  tbody.innerHTML = filtered.map(g => `
     <tr>
-      <td class="td-serial">${i + 1}</td>
 
-      <td><strong>${esc(g.name)}</strong></td>
+      <td>${g.name}</td>
 
-      <td class="td-place">
-        ${esc(g.place || '—')}
-      </td>
+      <td>${g.place || '-'}</td>
 
-      <td>
-        ${
-          g.relation
-            ? `<span class="rel-badge rel-${esc(g.relation)}">
-                 ${esc(relLabel(g.relation))}
-               </span>`
-            : '<span style="color:#ccc">—</span>'
-        }
-      </td>
+      <td>${g.relation || '-'}</td>
 
       <td>
-        <button
-          class="status-badge ${g.status}"
-          onclick="toggleStatus('${g.id}', this)"
-        >
-          <span class="status-dot"></span>
+        <button class="status-badge ${g.status}"
+          onclick="toggleStatus('${g.id}')">
 
-          ${
-            g.status === 'need'
-              ? 'Need to Contact'
-              : 'Contacted'
-          }
+          ${g.status === 'need'
+            ? 'Need'
+            : 'Contacted'}
+
         </button>
       </td>
 
-      <td class="td-date">
-        ${esc(g.addedOn || '')}
-      </td>
-
       <td>
-        <button
-          class="btn-delete"
-          onclick="deleteGuest('${g.id}')"
-          title="Remove"
-        >
+        <button class="btn-delete"
+          onclick="deleteGuest('${g.id}')">
           ✕
         </button>
       </td>
+
     </tr>
   `).join('');
 }
 
-// ── STATS ───────────────────────────────────────────
-function updateStats() {
+// TOGGLE STATUS
+async function toggleStatus(id){
+
+  const guest = allGuests.find(g => g.id == id);
+
+  if(!guest) return;
+
+  const newStatus =
+    guest.status === 'need'
+      ? 'contacted'
+      : 'need';
+
+  try{
+
+    const res = await fetch(SCRIPT_URL,{
+      method:'POST',
+      headers:{
+        'Content-Type':'text/plain'
+      },
+      body:JSON.stringify({
+        action:'updateStatus',
+        id,
+        status:newStatus
+      })
+    });
+
+    const data = await res.json();
+
+    if(!data.success){
+      throw new Error(data.error);
+    }
+
+    loadGuests();
+
+  }catch(err){
+
+    console.error(err);
+
+    showToast('Failed updating', true);
+
+  }
+}
+
+// DELETE
+async function deleteGuest(id){
+
+  if(!confirm('Delete guest?')){
+    return;
+  }
+
+  try{
+
+    const res = await fetch(SCRIPT_URL,{
+      method:'POST',
+      headers:{
+        'Content-Type':'text/plain'
+      },
+      body:JSON.stringify({
+        action:'delete',
+        id
+      })
+    });
+
+    const data = await res.json();
+
+    if(!data.success){
+      throw new Error(data.error);
+    }
+
+    showToast('Guest removed');
+
+    loadGuests();
+
+  }catch(err){
+
+    console.error(err);
+
+    showToast('Delete failed', true);
+
+  }
+}
+
+// STATS
+function updateStats(){
+
   const total = allGuests.length;
 
   const contacted = allGuests.filter(
@@ -458,61 +716,25 @@ function updateStats() {
     total - contacted;
 }
 
-// ── HELPERS ─────────────────────────────────────────
-async function postAction(body) {
-  return fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain'
-    },
-    body: JSON.stringify(body)
-  });
-}
-
-function esc(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
+// TOAST
 let toastTimer;
 
-function showToast(msg, isError) {
+function showToast(msg, error){
+
   const t = document.getElementById('toast');
 
   t.textContent = msg;
 
-  t.className =
-    'toast' +
-    (isError ? ' error' : '') +
-    ' show';
+  t.className = 'toast' + (error ? ' error' : '') + ' show';
 
   clearTimeout(toastTimer);
 
   toastTimer = setTimeout(() => {
     t.classList.remove('show');
-  }, 2800);
+  }, 3000);
 }
 
-document.getElementById('dup-modal')
-  .addEventListener('click', e => {
-    if (e.target === e.currentTarget) {
-      closeDupModal();
-    }
-  });
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    closeDupModal();
-  }
-
-  if (
-    e.key === 'Enter' &&
-    document.getElementById('page-add').classList.contains('active')
-  ) {
-    addGuest();
-  }
-});
 </script>
+
+</body>
+</html>
