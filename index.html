@@ -1,15 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Wedding Guest Tracker</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --cream:#faf6f0;
+  --rose:#c0745a;
+  --deep:#3a2218;
+  --gold:#b8975a;
+  --white:#fff;
+  --shadow:0 4px 24px rgba(0,0,0,.08);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Jost',sans-serif;
+  background:var(--cream);
+  color:var(--deep);
+}
+
+/* HEADER */
+
+header{
+  background:var(--deep);
+  padding:22px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  color:#f0d5c6;
+  font-size:1.6rem;
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+}
+
+.logo span{
+  color:var(--gold);
+}
+
+nav{
+  display:flex;
+  gap:10px;
+}
+
+.nav-btn{
+  border:none;
+  background:none;
+  color:#d5b5a0;
+  padding:10px 18px;
+  border-radius:30px;
+  cursor:pointer;
+  text-transform:uppercase;
+  font-size:.8rem;
+}
+
+.nav-btn.active{
+  background:var(--rose);
+  color:#fff;
+}
+
+/* PAGES */
+
+.page{
+  display:none;
+  max-width:950px;
+  margin:auto;
+  padding:40px 20px;
+}
+
+.page.active{
+  display:block;
+}
+
+.page h1{
+  font-size:2.5rem;
+  margin-bottom:30px;
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300;
+}
+
+.page h1 em{
+  color:var(--rose);
+}
+
+/* STATS */
+
+.stats{
+  display:flex;
+  gap:16px;
+  margin-bottom:30px;
+  flex-wrap:wrap;
+}
+
+.stat{
+  background:#fff;
+  flex:1;
+  min-width:180px;
+  border-radius:18px;
+  padding:24px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+
+.stat-number{
+  font-size:2.5rem;
+  font-family:'Cormorant Garamond',serif;
+}
+
+.stat-label{
+  font-size:.75rem;
+  text-transform:uppercase;
+  color:#888;
+}
+
+/* FORM */
+
+.card{
+  background:#fff;
+  border-radius:22px;
+  padding:32px;
+  box-shadow:var(--shadow);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:8px;
+  font-size:.75rem;
+  text-transform:uppercase;
+  color:#777;
+}
+
+.field input,
+.field select{
+  width:100%;
+  padding:12px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  background:#faf7f5;
+}
+
+.btn{
+  background:var(--rose);
+  color:#fff;
+  border:none;
+  padding:12px 22px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+/* TABLE */
+
+.controls{
+  display:flex;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.controls input,
+.controls select{
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+.controls input{
+  flex:1;
+}
+
+.table-wrap{
+  background:#fff;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+thead{
+  background:var(--deep);
+  color:#f0d5c6;
+}
+
+th{
+  padding:14px;
+  text-align:left;
+  font-size:.75rem;
+}
+
+td{
+  padding:14px;
+  border-bottom:1px solid #eee;
+}
+
+.status-select{
+  border:none;
+  padding:8px 12px;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+.delete-btn{
+  border:none;
+  background:none;
+  color:#d15b5b;
+  cursor:pointer;
+  font-size:1rem;
+}
+
+/* TOAST */
+
+.toast{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#333;
+  color:#fff;
+  padding:14px 20px;
+  border-radius:10px;
+  opacity:0;
+  transform:translateY(40px);
+  transition:.3s;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.toast.error{
+  background:#8a2f2f;
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .controls{
+    flex-direction:column;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+  <div class="logo">
+    Wedding <span>✦</span> Guests
+  </div>
+
+  <nav>
+
+    <button class="nav-btn active"
+      onclick="showPage('add', this)">
+      Add Guest
+    </button>
+
+    <button class="nav-btn"
+      onclick="showPage('list', this)">
+      Guest List
+    </button>
+
+  </nav>
+
+</header>
+
+<!-- ADD PAGE -->
+
+<div class="page active" id="page-add">
+
+  <h1>Add <em>Guests</em></h1>
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-number" id="totalGuests">0</div>
+      <div class="stat-label">Total Guests</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-number" id="contactedGuests">0</div>
+      <div class="stat-label">Contacted</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-number" id="pendingGuests">0</div>
+      <div class="stat-label">Pending</div>
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <div class="grid">
+
+      <div class="field">
+        <label>Name</label>
+        <input type="text" id="name">
+      </div>
+
+      <div class="field">
+        <label>Place</label>
+        <input type="text" id="place">
+      </div>
+
+      <div class="field">
+        <label>Relation</label>
+
+        <select id="relation">
+          <option value="family">Family</option>
+          <option value="friend">Friend</option>
+          <option value="colleague">Colleague</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Status</label>
+
+        <select id="status">
+          <option value="need">Need to Contact</option>
+          <option value="contacted">Contacted</option>
+        </select>
+      </div>
+
+    </div>
+
+    <br>
+
+    <button class="btn" onclick="addGuest()">
+      + Add Guest
+    </button>
+
+  </div>
+
+</div>
+
+<!-- LIST PAGE -->
+
+<div class="page" id="page-list">
+
+  <h1>Guest <em>List</em></h1>
+
+  <div class="controls">
+
+    <input
+      type="text"
+      placeholder="Search..."
+      id="search"
+      oninput="renderTable()"
+    >
+
+    <select id="filter" onchange="renderTable()">
+      <option value="all">All</option>
+      <option value="need">Need</option>
+      <option value="contacted">Contacted</option>
+    </select>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Place</th>
+          <th>Relation</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody id="tbody"></tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWI0_Xp6nR4WsUYR7muF-rWyaAJdpNUJ28UA-wymiW2RLQ-rGOoZLRZK5y_UxpjZ_M/exec";
 
-let allGuests = [];
+let guests = [];
 
-// LOAD PAGE
-window.addEventListener('DOMContentLoaded', () => {
+// LOAD
+window.onload = () => {
   loadGuests();
-});
+};
 
-// NAVIGATION
+// PAGE SWITCH
 function showPage(id, btn){
 
   document.querySelectorAll('.page')
@@ -24,28 +439,25 @@ function showPage(id, btn){
   btn.classList.add('active');
 
   if(id === 'list'){
-    filterTable();
+    renderTable();
   }
 }
 
-// LOAD GUESTS
+// LOAD DATA
 async function loadGuests(){
 
   try{
 
-    const res = await fetch(`${SCRIPT_URL}?action=getAll`);
+    const res =
+      await fetch(`${SCRIPT_URL}?action=getAll`);
 
     const data = await res.json();
 
-    if(!data.success){
-      throw new Error(data.error);
-    }
-
-    allGuests = data.guests || [];
+    guests = data.guests || [];
 
     updateStats();
 
-    filterTable();
+    renderTable();
 
   }catch(err){
 
@@ -56,16 +468,20 @@ async function loadGuests(){
   }
 }
 
-// ADD GUEST
+// ADD
 async function addGuest(){
 
-  const name = document.getElementById('inp-name').value.trim();
+  const name =
+    document.getElementById('name').value.trim();
 
-  const place = document.getElementById('inp-place').value.trim();
+  const place =
+    document.getElementById('place').value.trim();
 
-  const relation = document.getElementById('inp-relation').value;
+  const relation =
+    document.getElementById('relation').value;
 
-  const status = document.getElementById('inp-status').value;
+  const status =
+    document.getElementById('status').value;
 
   if(!name){
     showToast('Enter guest name', true);
@@ -74,7 +490,7 @@ async function addGuest(){
 
   try{
 
-    const res = await fetch(SCRIPT_URL,{
+    await fetch(SCRIPT_URL,{
       method:'POST',
       headers:{
         'Content-Type':'text/plain'
@@ -88,14 +504,8 @@ async function addGuest(){
       })
     });
 
-    const data = await res.json();
-
-    if(!data.success){
-      throw new Error(data.error);
-    }
-
-    document.getElementById('inp-name').value = '';
-    document.getElementById('inp-place').value = '';
+    document.getElementById('name').value = '';
+    document.getElementById('place').value = '';
 
     showToast('Guest added ✓');
 
@@ -110,27 +520,30 @@ async function addGuest(){
   }
 }
 
-// FILTER TABLE
-function filterTable(){
+// TABLE
+function renderTable(){
 
-  const tbody = document.getElementById('guest-tbody');
+  const tbody =
+    document.getElementById('tbody');
 
-  const search = document.getElementById('search-input')
-    .value
-    .toLowerCase();
+  const search =
+    document.getElementById('search')
+      .value
+      .toLowerCase();
 
-  const status = document.getElementById('filter-status').value;
+  const filter =
+    document.getElementById('filter').value;
 
-  let filtered = allGuests.filter(g => {
+  let filtered = guests.filter(g => {
 
     const matchSearch =
       g.name.toLowerCase().includes(search) ||
       (g.place || '').toLowerCase().includes(search);
 
-    const matchStatus =
-      status === 'all' || g.status === status;
+    const matchFilter =
+      filter === 'all' || g.status === filter;
 
-    return matchSearch && matchStatus;
+    return matchSearch && matchFilter;
 
   });
 
@@ -144,23 +557,17 @@ function filterTable(){
       <td>${g.relation || '-'}</td>
 
       <td>
+
         <select
+          class="status-select"
           onchange="changeStatus('${g.id}', this.value)"
-          class="status-badge ${g.status}"
-          style="
-            border:none;
-            padding:8px 12px;
-            border-radius:20px;
-            font-size:.75rem;
-            cursor:pointer;
-          "
         >
 
           <option
             value="need"
             ${g.status === 'need' ? 'selected' : ''}
           >
-            Need to Contact
+            Need
           </option>
 
           <option
@@ -171,31 +578,31 @@ function filterTable(){
           </option>
 
         </select>
+
       </td>
 
       <td>
+
         <button
-          class="btn-delete"
+          class="delete-btn"
           onclick="deleteGuest('${g.id}')"
         >
           ✕
         </button>
+
       </td>
 
     </tr>
   `).join('');
+
 }
 
 // CHANGE STATUS
-async function changeStatus(id, newStatus){
-
-  const guest = allGuests.find(g => g.id == id);
-
-  if(!guest) return;
+async function changeStatus(id, status){
 
   try{
 
-    const res = await fetch(SCRIPT_URL,{
+    await fetch(SCRIPT_URL,{
       method:'POST',
       headers:{
         'Content-Type':'text/plain'
@@ -203,34 +610,24 @@ async function changeStatus(id, newStatus){
       body:JSON.stringify({
         action:'updateStatus',
         id,
-        status:newStatus
+        status
       })
     });
 
-    const data = await res.json();
-
-    if(!data.success){
-      throw new Error(data.error);
-    }
-
-    guest.status = newStatus;
-
-    updateStats();
-
-    filterTable();
-
     showToast('Status updated ✓');
+
+    loadGuests();
 
   }catch(err){
 
     console.error(err);
 
-    showToast('Failed updating status', true);
+    showToast('Failed updating', true);
 
   }
 }
 
-// DELETE GUEST
+// DELETE
 async function deleteGuest(id){
 
   if(!confirm('Delete guest?')){
@@ -239,7 +636,7 @@ async function deleteGuest(id){
 
   try{
 
-    const res = await fetch(SCRIPT_URL,{
+    await fetch(SCRIPT_URL,{
       method:'POST',
       headers:{
         'Content-Type':'text/plain'
@@ -250,13 +647,7 @@ async function deleteGuest(id){
       })
     });
 
-    const data = await res.json();
-
-    if(!data.success){
-      throw new Error(data.error);
-    }
-
-    showToast('Guest removed');
+    showToast('Guest deleted');
 
     loadGuests();
 
@@ -269,24 +660,25 @@ async function deleteGuest(id){
   }
 }
 
-// UPDATE STATS
+// STATS
 function updateStats(){
 
-  const total = allGuests.length;
+  const total = guests.length;
 
-  const contacted = allGuests.filter(
-    g => g.status === 'contacted'
-  ).length;
+  const contacted =
+    guests.filter(g => g.status === 'contacted').length;
 
-  document.getElementById('stat-total').textContent = total;
+  document.getElementById('totalGuests')
+    .textContent = total;
 
-  document.getElementById('stat-contacted').textContent = contacted;
+  document.getElementById('contactedGuests')
+    .textContent = contacted;
 
-  document.getElementById('stat-pending').textContent =
-    total - contacted;
+  document.getElementById('pendingGuests')
+    .textContent = total - contacted;
 }
 
-// TOAST MESSAGE
+// TOAST
 let toastTimer;
 
 function showToast(msg, error){
@@ -305,6 +697,10 @@ function showToast(msg, error){
   toastTimer = setTimeout(() => {
     t.classList.remove('show');
   }, 3000);
+
 }
 
 </script>
+
+</body>
+</html>
